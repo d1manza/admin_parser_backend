@@ -17,6 +17,10 @@ const config = {
     server: {
         host: 'localhost',
         port: '4220'
+    },
+    jwt: {
+        secretKey: 'xxx',
+        ttl: '1h'
     }
 };
 
