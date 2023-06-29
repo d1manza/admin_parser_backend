@@ -10,22 +10,26 @@ class Db {
     }
 
     async getUserFromLogin(login) {
-        const user = await sequelize.query('select tu.id,\n' +
-            '       tu.password,\n' +
-            '       r.short_tittle,\n' +
-            '       tu.login\n' +
-            'from tg_users tu\n' +
-            'join tg_users_rights tur on tu.id = tur.id_users\n' +
-            'join rights r on tur.id_rights = r.id\n' +
-            'where tu."deletedAt" is null\n' +
-            'and tu.login = :login;', {
-                plain: true,
-                replacements: {login: login}
+        try {
+            const user = await sequelize.query('select tu.id,\n' +
+                '       tu.password,\n' +
+                '       r.short_tittle,\n' +
+                '       tu.login\n' +
+                'from tg_users tu\n' +
+                'join tg_users_rights tur on tu.id = tur.id_users\n' +
+                'join rights r on tur.id_rights = r.id\n' +
+                'where tu."deletedAt" is null\n' +
+                'and tu.login = :login;', {
+                    plain: true,
+                    replacements: {login: login}
+                }
+            );
+            if (user) {
+                return user
+            } else {
+                return false
             }
-        );
-        if (user) {
-            return user
-        } else {
+        } catch {
             return false
         }
     }
@@ -58,7 +62,24 @@ class Db {
         } catch {
             return false
         }
+    }
 
+    async createCategories(name, url, pageCount, cashbackCoef) {
+        try {
+            const category = Categories.create({
+                name: name,
+                url: url,
+                page_count: pageCount,
+                cashback_coef: cashbackCoef
+            });
+            if (category) {
+                return true
+            } else {
+                return false
+            }
+        } catch {
+            return false
+        }
     }
 
 }

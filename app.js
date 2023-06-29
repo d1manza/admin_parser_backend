@@ -18,6 +18,10 @@ app.get('/api/categories', jsonParser, function (req, res) {
     categories.getCategories(req, res);
 });
 
+app.post('/api/category', jsonParser, function (req, res) {
+    categories.createCategories(req, res);
+});
+
 const server = app.listen(config.server.port, function () {
     console.log(`Server listened host: ${config.server.host}, port: ${config.server.port}`);
 });
