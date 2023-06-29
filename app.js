@@ -14,7 +14,7 @@ app.post('/api/auth', jsonParser, function (req, res) {
     auth.login(req, res);
 });
 
-app.post('/api/categories', jsonParser, function (req, res) {
+app.get('/api/categories', jsonParser, function (req, res) {
     categories.getCategories(req, res);
 });
 

@@ -1,8 +1,9 @@
-const config = require('../config/config');
 const Db = require('./db');
 const db = new Db();
 const MiddlwareAuthJwt = require('../middleware/middlewareAuthJwt');
 const middlwareAuthJwt = new MiddlwareAuthJwt();
+const Shared = require('./shared');
+const shared = new Shared();
 
 class Auth {
     constructor() {
@@ -17,6 +18,7 @@ class Auth {
                 if (getUserFromLogin.password === password) {
                     const generateJwtToken = await middlwareAuthJwt.generateJwtToken(getUserFromLogin.id, getUserFromLogin.login);
                     if (generateJwtToken) {
+                        shared.logging('generateJwtToken', 'successfully', `generation jwt token from login: ${login}`);
                         res.status(200).send({
                             user_id: getUserFromLogin.id,
                             login: getUserFromLogin.login,
@@ -24,25 +26,25 @@ class Auth {
                             token: generateJwtToken
                         });
                     } else {
-                        console.log(`Function: generateJwtToken. Error generation jwt token from id: ${getUserFromLogin.id}`);
+                        shared.logging('generateJwtToken', 'error', `generation jwt token from login: ${login}`);
                         res.status(500).send({
                             message: 'Generate token error'
                         });
                     }
                 } else {
-                    console.log(`invalid password: ${login}`);
+                    shared.logging('login', 'error', `invalid password from login: ${login}`);
                     res.status(401).send({
                         message: 'Password error'
                     });
                 }
             } else {
-                console.log(`invalid login: ${login}`);
+                shared.logging('login', 'error', `invalid login: ${login}`);
                 res.status(401).send({
                     message: 'Login error'
                 });
             }
         } else {
-            console.log(`invalid validation params`);
+            shared.logging('login', 'error', 'Invalid validation params');
             res.status(400).send({
                 message: 'Invalid params'
             });
