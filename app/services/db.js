@@ -13,7 +13,8 @@ class Db {
     async getUserFromLogin(login) {
         const user = await sequelize.query('select tu.id,\n' +
             '       tu.password,\n' +
-            '       r.short_tittle\n' +
+            '       r.short_tittle,\n' +
+            '       tu.login\n' +
             'from tg_users tu\n' +
             'join tg_users_rights tur on tu.id = tur.id_users\n' +
             'join rights r on tur.id_rights = r.id\n' +

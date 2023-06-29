@@ -1,18 +1,11 @@
 const config = require('../config/config');
-const jwt = require('jsonwebtoken');
 const Db = require('./db');
 const db = new Db();
+const MiddlwareAuthJwt = require('../middleware/middlewareAuthJwt');
+const middlwareAuthJwt = new MiddlwareAuthJwt();
 
 class Auth {
     constructor() {
-    }
-
-    async generateToken(userId, login) {
-        const data = {
-            userId: userId,
-            login: login
-        };
-        return jwt.sign(data, config.jwt.secretKey, {expiresIn: config.jwt.ttl});
     }
 
     async login(req, res) {
@@ -22,39 +15,36 @@ class Auth {
             const getUserFromLogin = await db.getUserFromLogin(login);
             if (getUserFromLogin) {
                 if (getUserFromLogin.password === password) {
-                    const generateToken = await this.generateToken(getUserFromLogin.id, login);
-                    if (generateToken) {
-                        res.send({
-                            code: 1,
+                    const generateJwtToken = await middlwareAuthJwt.generateJwtToken(getUserFromLogin.id, getUserFromLogin.login);
+                    if (generateJwtToken) {
+                        res.status(200).send({
+                            user_id: getUserFromLogin.id,
+                            login: getUserFromLogin.login,
                             role: getUserFromLogin.short_tittle,
-                            token: generateToken
+                            token: generateJwtToken
                         });
                     } else {
-                        console.log(`Function: generateToken. Error generation jwt token from id: ${getUserFromLogin.id}, login: ${login}`);
-                        res.send({
-                            code: 2,
+                        console.log(`Function: generateJwtToken. Error generation jwt token from id: ${getUserFromLogin.id}`);
+                        res.status(500).send({
                             message: 'Generate token error'
                         });
                     }
                 } else {
                     console.log(`invalid password: ${login}`);
-                    res.send({
-                        code: 2,
+                    res.status(401).send({
                         message: 'Password error'
                     });
                 }
             } else {
                 console.log(`invalid login: ${login}`);
-                res.send({
-                    code: 2,
+                res.status(401).send({
                     message: 'Login error'
                 });
             }
         } else {
             console.log(`invalid validation params`);
-            res.send({
-                code: 2,
-                message: 'invalid params'
+            res.status(400).send({
+                message: 'Invalid params'
             });
         }
     }
